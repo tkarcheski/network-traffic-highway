@@ -2,3 +2,6 @@ node_modules
 dist
 data.db*
 qa-*.png
+
+# Python collector cache
+__pycache__/
