@@ -163,8 +163,8 @@ export default function Home() {
           )}
 
           {/* hint */}
-          <div className="pointer-events-none absolute bottom-2 left-1/2 z-10 -translate-x-1/2 rounded bg-black/40 px-2 py-1 font-pixel text-[8px] uppercase tracking-wide text-primary-foreground/70">
-            Drag to pan · scroll to zoom · click buildings & vehicles
+          <div className="pointer-events-none absolute bottom-3 left-1/2 z-10 hidden -translate-x-1/2 whitespace-nowrap rounded border border-card-border/60 bg-black/55 px-2.5 py-1 font-pixel text-[8px] uppercase tracking-wide text-primary-foreground/80 sm:block">
+            Drag to pan · scroll to zoom · click buildings &amp; vehicles
           </div>
         </main>
 
