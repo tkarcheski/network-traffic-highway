@@ -64,6 +64,7 @@ export const PROTOCOLS = [
   "icmp",
   "http",
   "https",
+  "ollama",
   "dns",
   "ssh",
   "udp",

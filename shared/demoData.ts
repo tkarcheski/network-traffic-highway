@@ -51,9 +51,18 @@ export const DEMO_FLOWS: DemoFlow[] = [
     src: "n-laptop",
     dst: "n-server",
     protocols: [
+      { protocol: "ollama", weight: 7, avgBytes: 48000 }, // local LLM calls on :11434
       { protocol: "ssh", weight: 4, avgBytes: 2400 },
       { protocol: "tcp", weight: 3, avgBytes: 64000 },
       { protocol: "http", weight: 2, avgBytes: 18000 },
+    ],
+  },
+  {
+    src: "n-phone",
+    dst: "n-server",
+    protocols: [
+      { protocol: "ollama", weight: 5, avgBytes: 36000 }, // phone app prompting the local model
+      { protocol: "https", weight: 2, avgBytes: 12000 },
     ],
   },
   {

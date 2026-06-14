@@ -5,6 +5,7 @@ export type Protocol =
   | "icmp"
   | "http"
   | "https"
+  | "ollama"
   | "dns"
   | "ssh"
   | "udp"
@@ -55,6 +56,13 @@ export const VEHICLES: Record<Protocol, VehicleSpec> = {
     color: "#2fb8a0",
     scale: 1.1,
     description: "Encrypted HTTPS traffic in armored transports.",
+  },
+  ollama: {
+    protocol: "ollama",
+    vehicle: "Llama",
+    color: "#e0934f",
+    scale: 1.25,
+    description: "Ollama LLM API on :11434 — llamas hauling prompts & tokens to the local model.",
   },
   dns: {
     protocol: "dns",
@@ -111,6 +119,7 @@ export const PROTO_ORDER: Protocol[] = [
   "icmp",
   "http",
   "https",
+  "ollama",
   "dns",
   "ssh",
   "udp",
