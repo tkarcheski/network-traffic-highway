@@ -93,6 +93,7 @@ export class CityEngine {
   private raf = 0;
   private last = 0;
   private spawnAcc = 0;
+  private liveMode = false;
   private vid = 1;
   private aid = 1;
   private dpr = 1;
@@ -118,6 +119,12 @@ export class CityEngine {
     this.gridW = Math.max(10, ...nodes.map((n) => n.gridX + 2));
     this.gridH = Math.max(8, ...nodes.map((n) => n.gridY + 2));
     this.centerCamera();
+  }
+
+  /** When a real collector starts feeding events, pause the demo simulation so
+   *  the city reflects only real traffic. */
+  setLiveMode(on: boolean) {
+    this.liveMode = on;
   }
 
   private node(id: string) {
@@ -271,6 +278,7 @@ export class CityEngine {
 
   // ---- demo simulation spawn ----
   private simSpawn(dt: number) {
+    if (this.liveMode) return; // real collector data is flowing — pause the demo sim
     if (this.flows.length === 0) return;
     const rate = 6 * this.cfg.intensity; // base events/sec
     this.spawnAcc += dt * rate;
