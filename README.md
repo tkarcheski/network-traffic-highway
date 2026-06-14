@@ -21,6 +21,9 @@ npm install
 npm run dev      # Express + Vite on http://localhost:5000
 ```
 
+To visualize your **real** network with Wireshark, follow the step-by-step
+**[INSTALL.md](./INSTALL.md)**.
+
 Production build:
 
 ```bash

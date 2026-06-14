@@ -6,7 +6,36 @@ interface Props {
   onToggle: (p: Protocol) => void;
 }
 
-function VehicleGlyph({ color, isTrain }: { color: string; isTrain?: boolean }) {
+function VehicleGlyph({
+  color,
+  isTrain,
+  isLlama,
+}: {
+  color: string;
+  isTrain?: boolean;
+  isLlama?: boolean;
+}) {
+  if (isLlama) {
+    return (
+      <svg width="22" height="14" viewBox="0 0 22 14" aria-hidden>
+        {/* legs */}
+        <rect x="8" y="10" width="1.5" height="3" fill={color} />
+        <rect x="11" y="10" width="1.5" height="3" fill={color} />
+        <rect x="13.5" y="10" width="1.5" height="3" fill={color} />
+        <rect x="16" y="10" width="1.5" height="3" fill={color} />
+        {/* body */}
+        <ellipse cx="13" cy="8.5" rx="6" ry="3" fill={color} />
+        {/* neck + head */}
+        <rect x="5" y="3" width="2.2" height="6" rx="1.1" fill={color} />
+        <ellipse cx="5.2" cy="3" rx="2" ry="1.6" fill={color} />
+        {/* ears */}
+        <path d="M4 1.8 L3.6 0.4 L5 1.8 Z" fill={color} />
+        <path d="M6 1.7 L6.4 0.3 L6.9 1.7 Z" fill={color} />
+        {/* eye */}
+        <circle cx="4.5" cy="3" r="0.5" fill="#1a1208" />
+      </svg>
+    );
+  }
   if (isTrain) {
     return (
       <svg width="22" height="14" viewBox="0 0 22 14" aria-hidden>
@@ -52,7 +81,11 @@ export function Legend({ enabled, counts, onToggle }: Props) {
                 }`}
               >
                 <span className="flex h-4 w-6 items-center justify-center">
-                  <VehicleGlyph color={v.color} isTrain={p === "train"} />
+                  <VehicleGlyph
+                    color={v.color}
+                    isTrain={p === "train"}
+                    isLlama={p === "ollama"}
+                  />
                 </span>
                 <span className="flex min-w-0 flex-1 flex-col leading-tight">
                   <span className="truncate text-xs font-semibold text-foreground">

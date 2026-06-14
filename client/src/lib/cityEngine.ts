@@ -93,6 +93,7 @@ export class CityEngine {
   private raf = 0;
   private last = 0;
   private spawnAcc = 0;
+  private liveMode = false;
   private vid = 1;
   private aid = 1;
   private dpr = 1;
@@ -118,6 +119,12 @@ export class CityEngine {
     this.gridW = Math.max(10, ...nodes.map((n) => n.gridX + 2));
     this.gridH = Math.max(8, ...nodes.map((n) => n.gridY + 2));
     this.centerCamera();
+  }
+
+  /** When a real collector starts feeding events, pause the demo simulation so
+   *  the city reflects only real traffic. */
+  setLiveMode(on: boolean) {
+    this.liveMode = on;
   }
 
   private node(id: string) {
@@ -250,6 +257,12 @@ export class CityEngine {
     const map: Record<Protocol, string[]> = {
       http: ["GET /index.html", "POST /api/update", "GET /assets/logo.png"],
       https: ["TLS 1.3 handshake", "GET /v2/feed", "stream chunk"],
+      ollama: [
+        ":11434 POST /api/generate",
+        ":11434 POST /api/chat",
+        ":11434 token stream",
+        ":11434 model pull",
+      ],
       dns: ["A example.com", "AAAA cdn.net", "PTR lookup"],
       ssh: ["session keepalive", "scp upload", "shell command"],
       icmp: ["echo request", "echo reply"],
@@ -265,6 +278,7 @@ export class CityEngine {
 
   // ---- demo simulation spawn ----
   private simSpawn(dt: number) {
+    if (this.liveMode) return; // real collector data is flowing — pause the demo sim
     if (this.flows.length === 0) return;
     const rate = 6 * this.cfg.intensity; // base events/sec
     this.spawnAcc += dt * rate;
@@ -612,6 +626,65 @@ export class CityEngine {
         ctx.fillRect(cp.x - 3 * this.zoom, cp.y - 7 * this.zoom, 6 * this.zoom, 2 * this.zoom);
       }
       (v as any)._hit = { x: p.x, y: p.y - 6 * this.zoom, r: 12 * this.zoom };
+      return;
+    }
+
+    // Ollama traffic (:11434) rides as a little pack llama instead of a car
+    if (v.protocol === "ollama") {
+      const wool = spec.color;
+      const dark = this.shade(wool, -0.45);
+      ctx.save();
+      ctx.translate(p.x, p.y - size);
+      // shadow
+      ctx.fillStyle = "rgba(0,0,0,0.3)";
+      ctx.beginPath();
+      ctx.ellipse(0, size * 0.95, size * 1.0, size * 0.4, 0, 0, Math.PI * 2);
+      ctx.fill();
+      // legs
+      ctx.fillStyle = dark;
+      for (const lx of [-0.55, -0.2, 0.2, 0.55]) {
+        ctx.fillRect(lx * size, size * 0.2, size * 0.16, size * 0.75);
+      }
+      // woolly body
+      ctx.fillStyle = wool;
+      ctx.beginPath();
+      ctx.ellipse(0, -size * 0.1, size * 0.85, size * 0.55, 0, 0, Math.PI * 2);
+      ctx.fill();
+      // token saddle-pack on the back
+      ctx.fillStyle = dark;
+      this.roundRect(ctx, -size * 0.35, -size * 0.6, size * 0.7, size * 0.3, 1.5);
+      ctx.fill();
+      // neck (up to the left)
+      ctx.fillStyle = wool;
+      this.roundRect(ctx, -size * 0.95, -size * 1.45, size * 0.34, size * 1.25, size * 0.16);
+      ctx.fill();
+      // head
+      ctx.beginPath();
+      ctx.ellipse(-size * 0.82, -size * 1.55, size * 0.32, size * 0.26, 0, 0, Math.PI * 2);
+      ctx.fill();
+      // ears
+      ctx.beginPath();
+      ctx.moveTo(-size * 0.95, -size * 1.8);
+      ctx.lineTo(-size * 1.02, -size * 2.06);
+      ctx.lineTo(-size * 0.8, -size * 1.85);
+      ctx.closePath();
+      ctx.moveTo(-size * 0.72, -size * 1.82);
+      ctx.lineTo(-size * 0.66, -size * 2.06);
+      ctx.lineTo(-size * 0.58, -size * 1.8);
+      ctx.closePath();
+      ctx.fill();
+      // muzzle
+      ctx.fillStyle = dark;
+      ctx.beginPath();
+      ctx.ellipse(-size * 1.0, -size * 1.5, size * 0.16, size * 0.13, 0, 0, Math.PI * 2);
+      ctx.fill();
+      // eye
+      ctx.fillStyle = "#1a1208";
+      ctx.beginPath();
+      ctx.arc(-size * 0.86, -size * 1.64, size * 0.07, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+      (v as any)._hit = { x: p.x, y: p.y - size, r: size * 1.8 };
       return;
     }
 

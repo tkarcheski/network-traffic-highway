@@ -24,6 +24,24 @@ function normalizeNodes(raw: any[]): CityNode[] {
   });
 }
 
+/** Insert or update a single node arriving live from the collector (SSE),
+ *  auto-placing it on a free-ish grid slot when it has no coords. */
+function upsertNode(prev: CityNode[], raw: any): CityNode[] {
+  const existing = prev.findIndex((p) => p.id === raw.id);
+  const idx = existing >= 0 ? existing : prev.length;
+  const gx = raw.gridX ?? raw.grid_x ?? 2 + (idx % 5) * 2;
+  const gy = raw.gridY ?? raw.grid_y ?? 1 + Math.floor(idx / 5) * 2;
+  const node: CityNode = {
+    id: raw.id, name: raw.name, ip: raw.ip, mac: raw.mac, kind: raw.kind, gridX: gx, gridY: gy,
+  };
+  if (existing >= 0) {
+    const copy = prev.slice();
+    copy[existing] = { ...copy[existing], ...node, gridX: copy[existing].gridX, gridY: copy[existing].gridY };
+    return copy;
+  }
+  return [...prev, node];
+}
+
 /**
  * Loads the city topology. Tries the backend (real or seeded), falls back to
  * the bundled demo dataset so the app always renders. Also opens an SSE
@@ -55,8 +73,13 @@ export function useCityData(engineRef: React.MutableRefObject<CityEngine | null>
       es.onmessage = (ev) => {
         try {
           const msg = JSON.parse(ev.data);
+          if (msg.type === "node" && msg.node) {
+            setNodes((prev) => upsertNode(prev, msg.node));
+            return;
+          }
           if (msg.type === "traffic" && msg.event) {
             setUsingRealData(true);
+            engineRef.current?.setLiveMode(true);
             engineRef.current?.injectEvent({
               srcId: msg.event.srcId ?? msg.event.src_id,
               dstId: msg.event.dstId ?? msg.event.dst_id,
@@ -67,6 +90,7 @@ export function useCityData(engineRef: React.MutableRefObject<CityEngine | null>
             });
           } else if (msg.type === "traffic-batch" && Array.isArray(msg.events)) {
             setUsingRealData(true);
+            engineRef.current?.setLiveMode(true);
             for (const e of msg.events) {
               engineRef.current?.injectEvent({
                 srcId: e.srcId ?? e.src_id,

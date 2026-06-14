@@ -12,6 +12,30 @@ API. The city updates live via Server-Sent Events.
                                           /api/stream     (SSE -> live animation)
 ```
 
+## Quick start: the included collector (no root)
+
+> For full Wireshark setup (install + non-root capture, step by step), see
+> **[INSTALL.md](./INSTALL.md)**.
+
+A ready-to-run collector ships in `script/collector.py`. It needs **no root and
+no dependencies** — it reads active sockets from `ss` (iproute2), auto-registers
+your devices, classifies each connection by port (including Ollama's **:11434 →
+llamas 🦙**), and streams real per-interval byte deltas to the app:
+
+```bash
+python3 script/collector.py                      # -> http://localhost:5000
+NHC_API=http://host:5000 python3 script/collector.py
+NHC_POLL=1.5 python3 script/collector.py         # faster polling
+```
+
+Leave the app open while it runs — the demo simulation pauses automatically and
+the city switches to your real traffic. External/internet endpoints collapse onto
+the gateway building; LAN peers and this host each get their own building. To see
+real llamas, make an Ollama request (e.g. `ollama run <model>`) while it runs.
+Byte counts come from the kernel's per-socket tcp-info when available (modern
+Linux); otherwise a small estimate is used. For raw packet capture with exact
+bytes, the scapy example below is an alternative (needs root).
+
 ## API reference
 
 Base URL = wherever the app is served (e.g. `http://localhost:5000`).
