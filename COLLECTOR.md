@@ -14,6 +14,9 @@ API. The city updates live via Server-Sent Events.
 
 ## Quick start: the included collector (no root)
 
+> For full Wireshark setup (install + non-root capture, step by step), see
+> **[INSTALL.md](./INSTALL.md)**.
+
 A ready-to-run collector ships in `script/collector.py`. It needs **no root and
 no dependencies** — it reads active sockets from `ss` (iproute2), auto-registers
 your devices, classifies each connection by port (including Ollama's **:11434 →
